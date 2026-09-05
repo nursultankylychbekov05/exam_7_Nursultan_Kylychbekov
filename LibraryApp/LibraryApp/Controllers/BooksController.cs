@@ -54,7 +54,7 @@ namespace LibraryApp.Controllers
             if (ModelState.IsValid)
             {
                 book.CreatedAt = DateTime.UtcNow;
-                book.IsAvailable = true; // При создании книга доступна
+                book.IsAvailable = true; 
                 _context.Add(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
