@@ -16,7 +16,7 @@
         <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Account">Личный кабинет</a></li>
     </ul>
 
-    <form asp-action="Create" method="post">
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <div class="mb-3">
@@ -37,6 +37,11 @@
                 <option value="">-- Выберите категорию --</option>
             </select>
             <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">PDF-версия книги</label>
+            <input type="file" name="pdfFile" class="form-control" accept=".pdf" />
         </div>
 
         <div class="mb-3">
