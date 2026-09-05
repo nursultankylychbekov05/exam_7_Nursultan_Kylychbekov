@@ -20,5 +20,7 @@ namespace LibraryApp.Models
         public string Phone { get; set; }
         
         public ICollection<BorrowRecord> BorrowRecords { get; set; } = new List<BorrowRecord>();
+        
+        
     }
 }

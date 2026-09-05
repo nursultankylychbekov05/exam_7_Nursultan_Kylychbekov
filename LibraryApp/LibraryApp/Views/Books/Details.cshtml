@@ -18,6 +18,7 @@
                 <div class="card-body">
                     <h3 class="card-title">@Model.Title</h3>
                     <p class="card-text"><strong>Автор:</strong> @Model.Author</p>
+                    <p class="card-text"><strong>Категория:</strong> <span class="badge bg-info text-dark">@(Model.Category?.Name ?? "Без категории")</span></p>
                     <p class="card-text"><strong>Год выпуска:</strong> @(Model.PublishYear?.ToString() ?? "Не указан")</p>
                     <p class="card-text">
                         <strong>Статус:</strong> 

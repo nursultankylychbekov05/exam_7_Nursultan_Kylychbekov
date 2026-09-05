@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryApp.Data;
+using LibraryApp.Models;
 
 namespace LibraryApp.Controllers
 {
@@ -51,6 +52,34 @@ namespace LibraryApp.Controllers
             }
 
             return RedirectToAction(nameof(Account), new { email = email });
+        }
+        
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(User user)
+        {
+            if (ModelState.IsValid)
+            {
+                bool emailExists = await _context.Users.AnyAsync(u => u.Email == user.Email);
+                if (emailExists)
+                {
+                    ModelState.AddModelError("Email", "Пользователь с таким email уже зарегистрирован.");
+                    return View(user);
+                }
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                
+                return RedirectToAction(nameof(Account), new { email = user.Email });
+            }
+
+            return View(user);
         }
     }
 }
