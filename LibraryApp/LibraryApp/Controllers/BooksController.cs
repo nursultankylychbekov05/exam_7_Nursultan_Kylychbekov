@@ -61,5 +61,62 @@ namespace LibraryApp.Controllers
             }
             return View(book);
         }
+        
+   
+        [HttpGet]
+        public async Task<IActionResult> Take(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var book = await _context.Books.FirstOrDefaultAsync(m => m.Id == id);
+            if (book == null || !book.IsAvailable) 
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(book);
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Take(int id, string email)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null || !book.IsAvailable)
+            {
+                return NotFound();
+            }
+            
+            var user = await _context.Users
+                .Include(u => u.BorrowRecords)
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Пользователь с таким email не найден в системе.");
+                return View(book);
+            }
+            
+            int activeBooksCount = user.BorrowRecords.Count(r => r.ReturnDate == null);
+            if (activeBooksCount >= 3)
+            {
+                ModelState.AddModelError("", "Превышен лимит: у вас на руках уже находится 3 книги.");
+                return View(book);
+            }
+            
+            book.IsAvailable = false;
+            
+            var borrowRecord = new BorrowRecord
+            {
+                UserId = user.Id,
+                BookId = book.Id,
+                BorrowDate = DateTime.UtcNow
+            };
+
+            _context.BorrowRecords.Add(borrowRecord);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }    
     }
 }

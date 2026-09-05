@@ -1,0 +1,70 @@
+﻿@model LibraryApp.Models.User
+
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<div class="container mt-4">
+    <h2>Личный кабинет</h2>
+    <hr />
+    
+    @if (Model == null)
+    {
+        <div class="card p-4 shadow-sm" style="max-width: 500px;">
+            <h4>Введите ваш email для входа в кабинет</h4>
+            <form method="get" asp-action="Account" class="mt-3">
+                <div class="mb-3">
+                    <input type="email" name="email" class="form-control" placeholder="Email..." required />
+                </div>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="mb-4">
+            <h4>Добро пожаловать, @Model.FirstName @Model.LastName!</h4>
+            <p class="text-muted">Email: @Model.Email | Телефон: @Model.Phone</p>
+            <a asp-action="Account" class="btn btn-sm btn-outline-secondary">Сменить пользователя</a>
+        </div>
+
+        <h3 class="mb-3">Книги на руках:</h3>
+
+        var activeRecords = Model.BorrowRecords?.Where(r => r.ReturnDate == null).ToList();
+
+        if (activeRecords == null || !activeRecords.Any())
+        {
+            <p class="text-muted">У вас нет книг на руках.</p>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+                @foreach (var record in activeRecords)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm text-center p-3">
+                            <img src="@(string.IsNullOrEmpty(record.Book.CoverImagePath) ? "https://via.placeholder.com/150x200?text=No+Cover" : record.Book.CoverImagePath)" 
+                                 class="card-img-top mx-auto" style="max-height: 200px; object-fit: contain;" alt="Обложка">
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">@record.Book.Title</h5>
+                                <p class="card-text text-muted mb-1">Автор: @record.Book.Author</p>
+                                <p class="card-text mb-3">Статус: <span class="badge bg-danger">Выдана</span></p>
+
+                                <div class="mt-auto d-flex justify-content-between">
+                                    <form asp-action="ReturnBook" method="post" class="w-100 me-1">
+                                        <input type="hidden" name="recordId" value="@record.Id" />
+                                        <input type="hidden" name="email" value="@Model.Email" />
+                                        <button type="submit" class="btn btn-sm btn-warning w-100">Сдать</button>
+                                    </form>
+                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@record.Book.Id" class="btn btn-sm btn-outline-secondary">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
