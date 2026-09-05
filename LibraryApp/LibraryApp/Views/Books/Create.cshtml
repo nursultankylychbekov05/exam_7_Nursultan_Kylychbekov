@@ -1,0 +1,53 @@
+﻿@model LibraryApp.Models.Book
+
+@{
+    ViewData["Title"] = "Добавить книгу";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <h2>Добавление новой книги</h2>
+    <hr />
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label">Название *</label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Author" class="form-label">Автор *</label>
+            <input asp-for="Author" class="form-control" />
+            <span asp-validation-for="Author" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CoverImagePath" class="form-label">Ссылка на фото обложки</label>
+            <input asp-for="CoverImagePath" class="form-control" placeholder="https://example.com/image.jpg" />
+            <span asp-validation-for="CoverImagePath" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PublishYear" class="form-label">Год выпуска</label>
+            <input asp-for="PublishYear" class="form-control" type="number" />
+            <span asp-validation-for="PublishYear" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Описание книги</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+            <button type="submit" class="btn btn-success">Сохранить книгу</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
