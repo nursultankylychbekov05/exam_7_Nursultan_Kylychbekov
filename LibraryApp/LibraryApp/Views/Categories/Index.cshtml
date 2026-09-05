@@ -1,0 +1,40 @@
+﻿@model IEnumerable<LibraryApp.Models.Category>
+
+@{
+    ViewData["Title"] = "Категории";
+}
+
+<div class="container mt-4" style="max-width: 700px;">
+    <h2>Список категорий</h2>
+    <hr />
+
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Index">Главная</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="BorrowedBooks">Выданные книги</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Create">Добавить книгу</a></li>
+        <li class="nav-item"><a class="nav-link active" asp-controller="Categories" asp-action="Index">Категории</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Account">Личный кабинет</a></li>
+    </ul>
+
+    <p>
+        <a asp-action="Create" class="btn btn-success">Добавить новую категорию</a>
+    </p>
+
+    <table class="table table-striped shadow-sm">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Название категории</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

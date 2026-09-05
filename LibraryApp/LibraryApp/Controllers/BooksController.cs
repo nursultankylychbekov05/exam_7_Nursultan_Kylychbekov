@@ -14,18 +14,53 @@ namespace LibraryApp.Controllers
             _context = context;
         }
         
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string searchString, string statusFilter, int? categoryId, string sortOrder, int page = 1)
         {
             int pageSize = 2; 
             
-            int totalBooks = await _context.Books.CountAsync();
+            ViewBag.CurrentSearch = searchString;
+            ViewBag.CurrentStatus = statusFilter;
+            ViewBag.CurrentCategory = categoryId;
+            ViewBag.CurrentSort = sortOrder;
             
-            var books = await _context.Books
-                .OrderByDescending(b => b.CreatedAt)
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+
+            var booksQuery = _context.Books.Include(b => b.Category).AsQueryable();
+            
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                booksQuery = booksQuery.Where(b => b.Title.Contains(searchString) || b.Author.Contains(searchString));
+            }
+            
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                if (statusFilter == "available")
+                    booksQuery = booksQuery.Where(b => b.IsAvailable);
+                else if (statusFilter == "borrowed")
+                    booksQuery = booksQuery.Where(b => !b.IsAvailable);
+            }
+            
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                booksQuery = booksQuery.Where(b => b.CategoryId == categoryId);
+            }
+            
+            booksQuery = sortOrder switch
+            {
+                "title_desc" => booksQuery.OrderByDescending(b => b.Title),
+                "author" => booksQuery.OrderBy(b => b.Author),
+                "author_desc" => booksQuery.OrderByDescending(b => b.Author),
+                "status" => booksQuery.OrderBy(b => b.IsAvailable),
+                _ => booksQuery.OrderByDescending(b => b.CreatedAt), 
+            };
+
+            int totalBooks = await booksQuery.CountAsync();
+
+            var books = await booksQuery
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            
+
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalBooks / (double)pageSize);
 
@@ -36,14 +71,19 @@ namespace LibraryApp.Controllers
         {
             if (id == null) return NotFound();
 
-            var book = await _context.Books.FirstOrDefaultAsync(m => m.Id == id);
+            var book = await _context.Books
+                .Include(b => b.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (book == null) return NotFound();
 
             return View(book);
         }
         
-        public IActionResult Create()
+        [HttpGet]
+        public async Task<IActionResult> Create()
         {
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             return View();
         }
         
@@ -54,15 +94,16 @@ namespace LibraryApp.Controllers
             if (ModelState.IsValid)
             {
                 book.CreatedAt = DateTime.UtcNow;
-                book.IsAvailable = true; 
+                book.IsAvailable = true;
                 _context.Add(book);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             return View(book);
         }
         
-   
         [HttpGet]
         public async Task<IActionResult> Take(int? id)
         {
@@ -105,7 +146,7 @@ namespace LibraryApp.Controllers
             }
             
             book.IsAvailable = false;
-            
+
             var borrowRecord = new BorrowRecord
             {
                 UserId = user.Id,
@@ -117,6 +158,17 @@ namespace LibraryApp.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
-        }    
+        }
+        
+        public async Task<IActionResult> BorrowedBooks()
+        {
+            var activeRecords = await _context.BorrowRecords
+                .Include(r => r.Book)
+                .Include(r => r.User)
+                .Where(r => r.ReturnDate == null)
+                .ToListAsync();
+
+            return View(activeRecords);
+        }
     }
 }

@@ -8,6 +8,14 @@
     <h2>Добавление новой книги</h2>
     <hr />
 
+    <!-- Навигационное меню -->
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Index">Главная</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="BorrowedBooks">Выданные книги</a></li>
+        <li class="nav-item"><a class="nav-link active" asp-controller="Books" asp-action="Create">Добавить книгу</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Account">Личный кабинет</a></li>
+    </ul>
+
     <form asp-action="Create" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -21,6 +29,15 @@
             <label asp-for="Author" class="form-label">Автор *</label>
             <input asp-for="Author" class="form-control" />
             <span asp-validation-for="Author" class="text-danger"></span>
+        </div>
+
+        <!-- Выпадающий список категорий -->
+        <div class="mb-3">
+            <label asp-for="CategoryId" class="form-label">Категория</label>
+            <select asp-for="CategoryId" class="form-select" asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))">
+                <option value="">-- Выберите категорию --</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
         </div>
 
         <div class="mb-3">

@@ -1,0 +1,49 @@
+﻿@model IEnumerable<LibraryApp.Models.BorrowRecord>
+
+@{
+    ViewData["Title"] = "Выданные книги";
+}
+
+<div class="container mt-4">
+    <h2>Список выданных книг</h2>
+    <hr />
+
+    <ul class="nav nav-pills mb-4">
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Index">Главная</a></li>
+        <li class="nav-item"><a class="nav-link active" asp-controller="Books" asp-action="BorrowedBooks">Выданные книги</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Create">Добавить книгу</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Account">Личный кабинет</a></li>
+    </ul>
+
+    @if (!Model.Any())
+    
+    {
+    <p class="text-muted">В данный момент нет выданных книг.</p>
+    }
+    else
+    {
+    <table class="table table-striped shadow-sm">
+        <thead class="table-dark">
+        <tr>
+            <th>Книга</th>
+            <th>Автор</th>
+            <th>Взял пользователь</th>
+            <th>Email</th>
+            <th>Дата выдачи</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@record.Book.Title</td>
+                <td>@record.Book.Author</td>
+                <td>@record.User.FirstName @record.User.LastName</td>
+                <td>@record.User.Email</td>
+                <td>@record.BorrowDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    }
+</div>

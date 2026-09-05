@@ -13,9 +13,10 @@
   
     <ul class="nav nav-pills mb-4">
         <li class="nav-item"><a class="nav-link active" asp-controller="Books" asp-action="Index">Главная</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Выданные книги</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="BorrowedBooks">Выданные книги</a></li>
         <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Create">Добавить книгу</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Личный кабинет</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Account">Личный кабинет</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Categories" asp-action="Index">Категории</a></li>
     </ul>
 
   
@@ -40,7 +41,7 @@
                         <div class="mt-auto d-flex justify-content-between">
                             @if (book.IsAvailable)
                             {
-                                <a href="#" class="btn btn-sm btn-primary">Получить</a>
+                                <a asp-action="Take" asp-route-id="@book.Id" class="btn btn-sm btn-primary">Получить</a>
                             }
                             else
                             {
